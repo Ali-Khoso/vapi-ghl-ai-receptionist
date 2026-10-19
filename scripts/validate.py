@@ -13,7 +13,6 @@ except ImportError:
     raise SystemExit("Missing jsonschema. Run: python -m pip install -r requirements-dev.txt")
 
 ROOT = Path(__file__).resolve().parents[1]
-CALLER_FIELDS = {"firstName", "phone", "address1"}
 LOCATION_PLACEHOLDER = "REPLACE_WITH_GHL_LOCATION_ID"
 CREDENTIAL_PLACEHOLDER = "REPLACE_WITH_VAPI_BEARER_CREDENTIAL_ID"
 
@@ -63,6 +62,8 @@ def schema_errors(value, schema):
             message = messages.get(error.validator, "does not match the project schema")
             if error.validator == "pattern" and path == "phone":
                 message = "must use E.164 syntax: +, nonzero country prefix, 2-15 ASCII digits"
+            elif error.validator == "pattern" and path == "locationId":
+                message = "must be a nonempty fixed identifier using ASCII letters, digits, underscores or hyphens"
             errors.append(f"{path}: {message}")
     return sorted(set(errors))
 
