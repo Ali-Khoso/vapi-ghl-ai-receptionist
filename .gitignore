@@ -11,3 +11,10 @@ logs/
 # OS files
 .DS_Store
 Thumbs.db
+# Python tooling
+__pycache__/
+*.py[cod]
+.venv/
+.coverage
+htmlcov/
+.pytest_cache/

@@ -21,7 +21,7 @@
       "phone": {
         "type": "string",
         "description": "Confirmed phone in E.164 format, including country code; ask if unclear.",
-        "pattern": "^\\+[1-9][0-9]{1,14}$"
+        "pattern": "^\\+[1-9][0-9]{1,14}(?![\\s\\S])"
       },
       "address1": {
         "type": "string",
