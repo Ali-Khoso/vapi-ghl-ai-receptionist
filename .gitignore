@@ -1,0 +1,13 @@
+# Credentials and account-specific files
+.env
+.env.*
+!.env.example
+*.private.json
+secrets/
+# Private call data
+recordings/
+transcripts/
+logs/
+# OS files
+.DS_Store
+Thumbs.db

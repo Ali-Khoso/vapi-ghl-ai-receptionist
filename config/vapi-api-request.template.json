@@ -1,0 +1,43 @@
+{
+  "type": "apiRequest",
+  "name": "Ghl_IBC_VA",
+  "description": "Create a GHL contact once the caller has provided and confirmed full name, phone, and address. Invoke once mid-call after all three are available. Do not announce internal CRM activity.",
+  "method": "POST",
+  "url": "https://services.leadconnectorhq.com/contacts/",
+  "credentialId": "REPLACE_WITH_VAPI_BEARER_CREDENTIAL_ID",
+  "headers": {
+    "Version": "2021-07-28",
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "type": "object",
+    "properties": {
+      "firstName": {
+        "type": "string",
+        "description": "Caller-confirmed full name; preserve the project mapping to firstName."
+      },
+      "phone": {
+        "type": "string",
+        "description": "Confirmed phone in E.164 format, including country code; ask if unclear.",
+        "pattern": "^\\+[1-9]\\d{1,14}$"
+      },
+      "address1": {
+        "type": "string",
+        "description": "Confirmed full service address including street and area/city."
+      }
+    },
+    "required": [
+      "firstName",
+      "phone",
+      "address1"
+    ],
+    "additionalProperties": false
+  },
+  "parameters": [
+    {
+      "key": "locationId",
+      "value": "REPLACE_WITH_GHL_LOCATION_ID"
+    }
+  ],
+  "timeoutSeconds": 20
+}

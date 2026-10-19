@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "properties": {
+    "firstName": {
+      "type": "string",
+      "description": "Caller-confirmed full name; preserve the project mapping to firstName."
+    },
+    "phone": {
+      "type": "string",
+      "description": "Confirmed phone in E.164 format, including country code; ask if unclear.",
+      "pattern": "^\\+[1-9]\\d{1,14}$"
+    },
+    "address1": {
+      "type": "string",
+      "description": "Confirmed full service address including street and area/city."
+    }
+  },
+  "required": [
+    "firstName",
+    "phone",
+    "address1"
+  ],
+  "additionalProperties": false
+}
