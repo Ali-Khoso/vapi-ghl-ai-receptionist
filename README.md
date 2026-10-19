@@ -2,6 +2,32 @@
 
 An inbound receptionist configuration by **Ali Ahmed Khoso**. **John Williamson**, the virtual receptionist for the example business **BrightFix Home Services**, collects confirmed caller details and invokes `Ghl_IBC_VA` to create a GoHighLevel contact.
 
+## Project screenshots and demo
+
+### 1. Assistant overview
+
+![John Williamson assistant overview showing the model, transcriber, voice, and identity prompt](assets/vapi-assistant-overview.png)
+
+### 2. Voice-call demonstration
+
+![Vapi voice-call recording and transcript](assets/vapi-call-demo.png)
+
+[Watch the supplied 90-second demo](assets/AI_Receptionist_Demo_90s.mp4)
+
+### 3. Receptionist prompt and first message
+
+![Original receptionist conversation flow, field mappings, and first message](assets/vapi-prompt-and-greeting.png)
+
+### 4. Attached contact tool
+
+![Vapi assistant Tools tab with Ghl_IBC_VA attached](assets/vapi-attached-contact-tool.png)
+
+### 5. Contact tool settings
+
+![Historical Ghl_IBC_VA Function tool settings and phone parameter](assets/vapi-contact-tool-settings.png)
+
+These supplied screenshots and the demo video show the original configuration. The historical greeting uses “Wellness Partners”; the recommended prompt uses BrightFix Home Services and John Williamson. The tool settings screenshot shows a Function tool; the template below uses API Request. See the [configuration review](docs/CONFIGURATION_REVIEW.md) for corrections. These images do not establish a successful CRM write or demonstrate the revised configuration.
+
 This repository contains prompts, a Vapi API Request template, synthetic fixtures, and offline Python checks. It is **not a running web application or webhook adapter**. The templates have not been deployed or verified against live Vapi or GHL accounts. No appointment booking, dispatch, SMS, durable deduplication, or manual follow-up queue is implemented.
 
 ## Start with offline checks
@@ -62,13 +88,9 @@ Attach one contact-saving tool named exactly `Ghl_IBC_VA`. The assistant should 
 
 Repository checks run on pushes and pull requests. The Python validators are local authoring checks; they are not installed into Vapi and cannot guarantee its runtime schema enforcement.
 
-## Preserved demonstration
+## Media and private configuration
 
-[Watch the supplied 90-second demo](assets/AI_Receptionist_Demo_90s.mp4)
-
-![Vapi call recording and transcript](assets/vapi-call-demo.png)
-
-These original assets are preserved unchanged. The screenshot's greeting uses “Wellness Partners”; the recommended configuration uses BrightFix Home Services and John Williamson. Historical media does not demonstrate the revised configuration or a successful CRM write. Account-specific configuration screenshots referenced in the historical review were not present in the supplied project.
+The original video and call screenshot are preserved unchanged, and four additional screenshots supplied by the author are included in the gallery above.
 
 Keep credentials, real customer information, transcripts, and new recordings out of Git. Private configuration copies should use the ignored `*.private.json` suffix. See [media provenance](assets/README.md).
 

@@ -19,4 +19,4 @@ These observations describe the images, not a tested running integration.
 5. Configure the API headers described in SETUP.md. The screenshot does not show enough to confirm their presence.
 6. Only one contact-saving tool should be attached for this prompt. A separate built-in tool with a different name will not automatically match `Ghl_IBC_VA`.
 
-The package deliberately omits the original screenshots because they contain account-specific identifiers. It uses placeholders instead.
+The author later supplied four screenshots now included in the [README gallery](../README.md#project-screenshots-and-demo): assistant overview, prompt and greeting, attached tool, and Function tool settings. They show the historical setup; the recommended template remains an API Request tool. The authentication, static-body, and native GHL tool screenshots discussed above remain historical observations without included image files. Configuration templates use placeholders.
