@@ -1,33 +1,32 @@
-# Put the project on GitHub
+# Maintain the GitHub repository
 
-Suggested repository name: `vapi-ghl-ai-receptionist`
+Target: [Ali-Khoso/vapi-ghl-ai-receptionist](https://github.com/Ali-Khoso/vapi-ghl-ai-receptionist).
 
-Suggested description: “Inbound AI receptionist using Vapi and GoHighLevel for conversational contact capture, with prompt, setup guide, and test checklist.”
+The supplied folder originally had no Git history and the target remote was empty. The original project and demo assets were imported before improvements. Work in this checkout without reinitializing Git or replacing history.
 
-This package is ready for a repository. A hosted GitHub repository has not been created by this delivery.
-
-## Browser method — no GitHub CLI needed
-
-1. Extract the ZIP.
-2. Open https://github.com/new while signed in to your own account.
-3. Use the suggested name and description. Choose the visibility you want. Leave automatic README creation unchecked because this project already includes README.md.
-4. Create the repository and choose Upload files.
-5. Drag the CONTENTS of the extracted `repo` folder into GitHub: README.md and the assets, config, docs, examples, and prompts folders. Do not upload the ZIP as the only file or nest the whole project one level below the root.
-6. Commit the upload. Confirm that GitHub displays the README on the repository homepage.
-
-## VS Code terminal method
-
-Create an empty repository first. Open the extracted project folder in VS Code. Run these commands one line at a time, replacing YOUR_USERNAME with the account you used:
+## Inspect and verify first
 
 ```sh
-git init
-git add .
-git commit -m "Add Vapi and GoHighLevel receptionist project"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/vapi-ghl-ai-receptionist.git
-git push -u origin main
+git status --short --branch
+git remote -v
+git log -5 --oneline
 ```
 
-If Git asks for your author identity, configure your own name and email. If authentication is needed, use GitHub's sign-in flow. Do not put tokens in remote URLs. These commands assume a new extracted folder with no existing remote.
+Confirm that `origin` points to the intended repository. If GitHub CLI is installed, `gh auth status` checks its login; Git's credential manager may have a separate saved login. Use GitHub's sign-in flow when needed. Never put access tokens in commands or remote URLs.
 
-Before publishing, confirm that placeholders remain in templates. Add a demo link to README.md after recording. Suggested topics: vapi, gohighlevel, voice-ai, ai-receptionist, crm-automation.
+## Validate and publish coherent changes
+
+```sh
+python scripts/validate.py --payload examples/contact-payload.json
+python -m unittest discover -s tests -v
+python scripts/check_repository.py
+git diff --check
+git diff
+git status --short
+```
+
+Stage the intended files explicitly, inspect `git diff --cached`, and commit a useful change. Use a normal `git push origin main` when working on main, or push a review branch.
+
+If a push is rejected because the remote advanced, fetch and inspect the incoming commits. Integrate the history carefully before retrying. Never force-push, delete existing branches to bypass a rejection, or create empty commits to inflate a count.
+
+Keep the supplied MP4 and PNG. Never commit private configuration, bearer tokens, real customer information, call logs, or transcripts. `.gitignore` reduces accidental additions but is not a credential scanner.

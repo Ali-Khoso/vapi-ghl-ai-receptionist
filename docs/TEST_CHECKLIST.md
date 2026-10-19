@@ -1,20 +1,42 @@
-# Live test checklist
+# Test checklist
 
-These checks are pending execution in the owner's accounts. No passing results are claimed here.
+## Automated offline checks
 
-| Test | Expected result |
+Run from the repository root after installing `requirements-dev.txt`:
+
+```sh
+python scripts/validate.py --arguments examples/tool-arguments.json
+python scripts/validate.py --payload examples/contact-payload.json
+python -m unittest discover -s tests -v
+python scripts/check_repository.py
+git diff --check
+```
+
+Expected: validation succeeds with placeholders permitted, all unit tests pass, repository checks pass, and Git reports no whitespace errors. The unit tests forbid socket creation while exercising validators. No service credentials are needed.
+
+The suite covers missing/blank/wrong-type caller fields, E.164 syntax boundaries, extra fields, caller-injected location, unsafe static overrides, schema drift, endpoint/header/tool-name errors, malformed JSON, duplicate keys, destination mismatches, placeholder rejection, and CLI failure exits without echoing submitted values.
+
+`python scripts/validate.py --configured` against the public template **must fail** because the credential and location are placeholders. This is a negative preflight, not a broken repository.
+
+## Optional future account acceptance
+
+These account-level checks are **pending and were not executed**. They require a separate decision to deploy and use the owner's accounts; repository automation never runs them.
+
+| Case | Expected observation |
 | --- | --- |
-| Complete standard request | Confirmed name, phone, address; one tool invocation before end of call; matching contact |
-| Caller corrects phone before save | Corrected number repeated and sent as a string |
-| Missing country code | Ask for clarification rather than invent a country |
-| Missing required detail after two asks | No contact-tool call; polite close |
-| Quote-only request | No invented price; quote-only urgency reflected in conversation |
-| Tool authentication failure | No false claim that a contact or appointment was created; failure visible in logs |
-| Static body inspection | Only locationId fixed; caller fields are dynamic |
-| Repeated/duplicate contact | Inspect actual GHL behavior; no assumption of deduplication |
-| Call interrupted before required details | No partial contact request |
-| Post-save detail correction | Note original value remains unless an update path is implemented |
-| Issue and urgency | Summary includes them; no claim they are persisted in GHL |
-| Final recording | Real observed results; no credentials or real customer details visible |
+| Greeting | John Williamson at BrightFix Home Services; first message matches active prompt |
+| Complete standard inquiry | Three confirmed string arguments; one mid-call tool attempt; matching contact after confirmed success |
+| Correct phone before save | Corrected number repeated and sent |
+| Missing country code | Clarification; no invented digits |
+| Missing required detail after two asks | No tool attempt; polite explanation |
+| Quote-only | No invented price or appointment |
+| Authentication/authorization failure | No success claim or automatic retry; result visible to account operator |
+| Timeout/unknown outcome | No claim that nothing was saved; no blind second create |
+| Static body | Only locationId fixed; caller values stay dynamic |
+| Duplicate contact | Inspect account settings and actual result; no assumed deduplication |
+| Call ends before required details | No partial request |
+| Correction after submission | No second create; no unsupported update claim |
+| Issue and urgency | Summarized conversationally; no claim that this payload stores them |
+| Failed contact write | No claim a manual task was automatically created |
 
-Record: test date, case, actual result, tool-call count, and any correction needed. Keep real transcripts and account-specific logs private.
+Record date, case, observed result, tool-attempt count, and any correction privately. Inspect both the tool response and destination contact; a friendly voice response alone proves neither. Keep credentials, customer details, transcripts, and account logs out of Git. The preserved demo media is historical evidence, not a passing result for these cases.

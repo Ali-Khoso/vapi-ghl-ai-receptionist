@@ -1,75 +1,77 @@
 # Vapi + GoHighLevel AI Receptionist
 
-An inbound voice receptionist project by **Ali Ahmed Khoso**, using Vapi to collect caller details and send a contact request to GoHighLevel.
+An inbound receptionist configuration by **Ali Ahmed Khoso**. **John Williamson**, the virtual receptionist for the example business **BrightFix Home Services**, collects confirmed caller details and invokes `Ghl_IBC_VA` to create a GoHighLevel contact.
 
-John Williamson is the receptionist persona. BrightFix Home Services is the example business in the supplied prompt. Replace the business name when adapting the project.
+This repository contains prompts, a Vapi API Request template, synthetic fixtures, and offline Python checks. It is **not a running web application or webhook adapter**. The templates have not been deployed or verified against live Vapi or GHL accounts. No appointment booking, dispatch, SMS, durable deduplication, or manual follow-up queue is implemented.
 
-## What this project covers
+## Start with offline checks
 
-- Friendly intake for HVAC, plumbing, and electrical service requests.
-- One question at a time, with phone and address confirmation.
-- Mid-call contact creation through `Ghl_IBC_VA` once all three required details are available.
-- Conversation-level collection of the issue and urgency.
-- A repeatable test checklist.
+Use Python 3.11 or newer. From the repository root:
 
-**Status:** This is a configuration and documentation repository based on the author's prompt and screenshots. The supplied screenshots were reviewed; no live Vapi call or GoHighLevel write was performed while preparing this package. The JSON files are templates, not an export of the author's live assistant. There is no local application to run.
+```sh
+python -m venv .venv
+```
 
-## Flow
+Activate it with `.venv\Scripts\Activate.ps1` in PowerShell, or `source .venv/bin/activate` on macOS/Linux. If PowerShell activation is restricted, run `.venv\Scripts\python.exe` in place of `python`; no execution-policy change is needed.
 
-The caller speaks to John Williamson in Vapi. John Williamson confirms the name, phone, and address, then invokes `Ghl_IBC_VA`. The configured request creates a GoHighLevel contact. John Williamson continues with urgency and a summary; the human team handles follow-up.
+```sh
+python -m pip install -r requirements-dev.txt
+python scripts/validate.py
+python scripts/validate.py --arguments examples/tool-arguments.json
+python scripts/validate.py --payload examples/contact-payload.json
+python -m unittest discover -s tests -v
+python scripts/check_repository.py
+```
 
-## Field mapping
+Dependency installation needs package-index access. Validation and tests run offline, require no credentials, and never send contact requests. Exit code 0 means the local checks passed; it does not establish authorization, number ownership, or live tool behavior.
 
-| Caller information | Tool field | Type | Source |
-| --- | --- | --- | --- |
-| Full name | `firstName` | String | Caller |
-| Confirmed international phone | `phone` | String | Caller |
-| Full service address | `address1` | String | Caller |
-| GHL sub-account/location | `locationId` | String | Fixed private configuration |
+## Request flow and mappings
 
-The full name intentionally goes into `firstName` to preserve the author's exact mapping. This means GHL's first-name field contains the full name. Issue and urgency are **not** in this contact payload; storing them requires an additional mapping or workflow.
+Caller -> John Williamson -> confirmed arguments -> Vapi merges fixed location -> GHL `POST /contacts/`.
 
-## Files
+| Information | Model-generated argument | Destination |
+| --- | --- | --- |
+| Confirmed full name | `firstName` string | GHL `firstName`; intentionally holds the full name |
+| Confirmed international phone | `phone` string | GHL `phone`; E.164 syntax |
+| Confirmed full service address | `address1` string | GHL `address1`; combined address |
+| Account owner's destination | None | Fixed `parameters[].key = locationId` |
+
+GHL also supports separate `name`, `lastName`, city, and postal fields. This project preserves the original three-field mapping; it does not split names or addresses. Issue and urgency are collected conversationally and **are not stored** by this contact payload.
+
+The body schema describes only the three caller arguments. Vapi adds `locationId` afterward through static parameters, which override matching model values. Never add static overrides for caller fields. See [Vapi request configuration](https://docs.vapi.ai/tools/api-request/configuration) and [HighLevel Create Contact](https://marketplace.gohighlevel.com/docs/2021-07-28/ghl/contacts/create-contact/index.html).
+
+## Configure your own account later
+
+Follow [setup](docs/SETUP.md) to privately replace the credential reference and location placeholder. Use the [recommended John Williamson prompt](prompts/john-williamson.md), and match the assistant's first message to it. The [original prompt](prompts/john-williamson-original.md) remains unchanged for provenance.
+
+Attach one contact-saving tool named exactly `Ghl_IBC_VA`. The assistant should attempt it once after confirming the name, phone, and address, before the closing summary. Missing details mean no request. Errors and timeouts must not produce a success claim or automatic create retry. Prompt instructions cannot enforce exactly-once delivery.
+
+## Project files
 
 | File | Purpose |
 | --- | --- |
-| [Original prompt](prompts/john-williamson-original.md) | Author-supplied assistant instructions |
-| [Setup guide](docs/SETUP.md) | How to recreate and use the project |
-| [Screenshot review](docs/CONFIGURATION_REVIEW.md) | Corrections and unverified parts |
-| [Tool body schema](config/contact-body.schema.json) | Three required caller fields |
-| [API Request template](config/vapi-api-request.template.json) | Proposed direct-API implementation |
-| [Example contact payload](examples/contact-payload.json) | Synthetic data showing the outgoing body |
-| [Test checklist](docs/TEST_CHECKLIST.md) | Live checks to run in your own account |
-| [GitHub upload guide](docs/GITHUB_UPLOAD.md) | Create and upload the repository |
-| [Sources](docs/SOURCES.md) | Official technical references |
+| [Setup](docs/SETUP.md) | Account configuration and private preflight |
+| [Troubleshooting](docs/TROUBLESHOOTING.md) | Validation, authentication, request, and duplicate failures |
+| [Caller schema](config/contact-body.schema.json) | Required dynamic fields; extra fields rejected |
+| [Vapi template](config/vapi-api-request.template.json) | Direct REST API Request tool, not a Function webhook |
+| [Synthetic fixtures](examples/README.md) | Valid arguments, outgoing body, and invalid inputs |
+| [Test checklist](docs/TEST_CHECKLIST.md) | Automated checks and optional future account acceptance |
+| [Screenshot review](docs/CONFIGURATION_REVIEW.md) | Historical observations and configuration corrections |
+| [GitHub maintenance](docs/GITHUB_UPLOAD.md) | Preserve history and push normal commits |
+| [Sources](docs/SOURCES.md) | Official references and verification limits |
 
-## Quick start
+Repository checks run on pushes and pull requests. The Python validators are local authoring checks; they are not installed into Vapi and cannot guarantee its runtime schema enforcement.
 
-1. Read the screenshot review before copying the current tool settings.
-2. Configure your own GHL credential and location ID using the setup guide.
-3. Create the tool and attach it to your Vapi assistant.
-4. Paste the original prompt. Review the suggested wording adjustments in the setup guide.
-5. Test with synthetic details and inspect both the Vapi tool result and the GHL contact.
-6. Record a demonstration showing the real outcome from your test.
+## Preserved demonstration
 
-## Scope and limitations
-
-This setup captures contact details. It does not book a calendar appointment, dispatch a technician, send an SMS, or implement a manual fallback queue. A prompt instruction to call a tool exactly once is an intended behavior, not an enforced delivery guarantee. Verify call logs; production duplicate protection requires implementation beyond the prompt.
-
-The fifth screenshot shows a separate native GHL contact tool. Do not attach both contact-creation tools to this demo. The supplied prompt expects the exact name `Ghl_IBC_VA`.
-
-## Reuse
-
-Change the business identity, supported services, greeting, and contact credentials for your own business. Keep the three field names aligned between the prompt and schema. The original prompt is preserved separately from configuration corrections. No software license is assigned in this package; contact the author for reuse permission before redistribution.
-
-## Demo video
-
-[Watch the 90-second demo](assets/AI_Receptionist_Demo_90s.mp4)
-
-The video is included in the assets folder. To display an embedded player on GitHub, drag this MP4 into the README editing box and commit the generated attachment link.
-
-## Call demonstration screenshot
+[Watch the supplied 90-second demo](assets/AI_Receptionist_Demo_90s.mp4)
 
 ![Vapi call recording and transcript](assets/vapi-call-demo.png)
 
-Screenshot supplied by the author showing a web call and its opening transcript. The recorded greeting uses “Wellness Partners”; the project prompt uses “BrightFix Home Services”. This image does not show the CRM result.
+These original assets are preserved unchanged. The screenshot's greeting uses “Wellness Partners”; the recommended configuration uses BrightFix Home Services and John Williamson. Historical media does not demonstrate the revised configuration or a successful CRM write. Account-specific configuration screenshots referenced in the historical review were not present in the supplied project.
+
+Keep credentials, real customer information, transcripts, and new recordings out of Git. Private configuration copies should use the ignored `*.private.json` suffix. See [media provenance](assets/README.md).
+
+## Reuse
+
+Adapt the business identity and services in the active prompt and greeting together. Preserve the tool and field names unless updating their mappings throughout. No software license is assigned; contact the author for redistribution permission.
