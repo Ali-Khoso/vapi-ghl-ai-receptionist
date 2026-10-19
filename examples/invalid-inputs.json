@@ -1,0 +1,9 @@
+[
+  {"case": "missing phone", "arguments": {"firstName": "Alex Morgan", "address1": "24 Example Street, Example City"}, "errorField": "phone"},
+  {"case": "numeric static phone", "arguments": {"firstName": "Alex Morgan", "phone": 20, "address1": "24 Example Street, Example City"}, "errorField": "phone"},
+  {"case": "missing country code", "arguments": {"firstName": "Alex Morgan", "phone": "2025550147", "address1": "24 Example Street, Example City"}, "errorField": "phone"},
+  {"case": "blank name", "arguments": {"firstName": "   ", "phone": "+12025550147", "address1": "24 Example Street, Example City"}, "errorField": "firstName"},
+  {"case": "null address", "arguments": {"firstName": "Alex Morgan", "phone": "+12025550147", "address1": null}, "errorField": "address1"},
+  {"case": "caller supplies location", "arguments": {"firstName": "Alex Morgan", "phone": "+12025550147", "address1": "24 Example Street, Example City", "locationId": "SYNTHETIC_OTHER_LOCATION"}, "errorField": "locationId"},
+  {"case": "unsupported urgency field", "arguments": {"firstName": "Alex Morgan", "phone": "+12025550147", "address1": "24 Example Street, Example City", "urgency": "standard"}, "errorField": "urgency"}
+]
