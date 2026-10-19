@@ -4,6 +4,8 @@ An inbound receptionist configuration by **Ali Ahmed Khoso**. **John Williamson*
 
 ## Project screenshots and demo
 
+[Watch the supplied 90-second demo](assets/AI_Receptionist_Demo_90s.mp4)
+
 ### 1. Assistant overview
 
 ![John Williamson assistant overview showing the model, transcriber, voice, and identity prompt](assets/vapi-assistant-overview.png)
@@ -11,8 +13,6 @@ An inbound receptionist configuration by **Ali Ahmed Khoso**. **John Williamson*
 ### 2. Voice-call demonstration
 
 ![Vapi voice-call recording and transcript](assets/vapi-call-demo.png)
-
-[Watch the supplied 90-second demo](assets/AI_Receptionist_Demo_90s.mp4)
 
 ### 3. Receptionist prompt and first message
 
