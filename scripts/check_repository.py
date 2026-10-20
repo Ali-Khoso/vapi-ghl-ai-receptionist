@@ -8,11 +8,11 @@ from urllib.parse import unquote, urlsplit
 
 try:
     from scripts.validate import (CREDENTIAL_PLACEHOLDER, LOCATION_PLACEHOLDER, ROOT,
-                                  load_json, validate_arguments, validate_payload, validate_tool)
+                                  caller_schema, load_json, validate_arguments, validate_payload, validate_tool)
 except ModuleNotFoundError:
     # Support both `python -m scripts.check_repository` and the README's direct command.
     from validate import (CREDENTIAL_PLACEHOLDER, LOCATION_PLACEHOLDER, ROOT,
-                          load_json, validate_arguments, validate_payload, validate_tool)
+                          caller_schema, load_json, validate_arguments, validate_payload, validate_tool)
 
 
 def media_hash(path):
@@ -46,6 +46,30 @@ def check_links(root):
     return errors
 
 
+def check_invalid_fixtures(cases):
+    """Ensure negative examples still fail for their declared field."""
+    if not isinstance(cases, list) or not cases:
+        return ["invalid fixtures: require a nonempty list"]
+    errors = []
+    names = set()
+    for index, case in enumerate(cases, 1):
+        prefix = f"invalid fixture {index}"
+        if (not isinstance(case, dict) or set(case) != {"case", "arguments", "errorField"}
+                or not isinstance(case["case"], str) or not case["case"].strip()
+                or not isinstance(case["arguments"], dict)
+                or not isinstance(case["errorField"], str) or not case["errorField"].strip()):
+            errors.append(f"{prefix}: require case, arguments and errorField")
+            continue
+        if case["case"] in names:
+            errors.append(f"{prefix}: duplicate case name")
+        names.add(case["case"])
+        field = case["errorField"] if case["errorField"] in caller_schema()["properties"] else "body"
+        failures = validate_arguments(case["arguments"])
+        if not any(error.startswith((field + ":", "body." + field + ":")) for error in failures):
+            errors.append(f"{prefix}: expected field rejection is missing")
+    return errors
+
+
 def check_repository(root=ROOT):
     root = Path(root)
     errors = []
@@ -70,6 +94,7 @@ def check_repository(root=ROOT):
         errors.extend(validate_payload(payload))
         if not isinstance(arguments, dict) or payload != {**arguments, "locationId": LOCATION_PLACEHOLDER}:
             errors.append("example payload: must match arguments plus the public location placeholder")
+        errors.extend(check_invalid_fixtures(load_json(root / "examples/invalid-inputs.json")))
     except ValueError:
         errors.append("required template or fixture: unreadable JSON")
     errors.extend(check_links(root))

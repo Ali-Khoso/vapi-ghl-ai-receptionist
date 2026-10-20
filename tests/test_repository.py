@@ -5,7 +5,7 @@ import shutil
 import tempfile
 import unittest
 
-from scripts.check_repository import ROOT, check_links, check_repository, media_hash
+from scripts.check_repository import ROOT, check_invalid_fixtures, check_links, check_repository, media_hash
 
 
 class RepositoryTests(unittest.TestCase):
@@ -30,6 +30,19 @@ class RepositoryTests(unittest.TestCase):
             self.assertNotIn("PRIVATE_VALUE", str(errors))
             (root / "README.md").write_text("[bad](https://[invalid)", encoding="utf-8")
             self.assertEqual(1, len(check_links(root)))
+
+    def test_invalid_fixture_contract_rejects_drift(self):
+        cases = json.loads((ROOT / "examples/invalid-inputs.json").read_text(encoding="utf-8"))
+        self.assertEqual([], check_invalid_fixtures(cases))
+        for value in ([], {}, [None], [{"case": "PRIVATE_VALUE"}], cases[:1] * 2):
+            errors = check_invalid_fixtures(value)
+            self.assertTrue(errors)
+            self.assertNotIn("PRIVATE_VALUE", str(errors))
+        valid = json.loads((ROOT / "examples/tool-arguments.json").read_text(encoding="utf-8"))
+        self.assertTrue(check_invalid_fixtures([
+            {"case": "accidentally valid", "arguments": valid, "errorField": "phone"}]))
+        self.assertTrue(check_invalid_fixtures([
+            {**cases[0], "errorField": "address1"}]))
 
     def test_streamed_media_hash_handles_multiple_chunks(self):
         with tempfile.TemporaryDirectory() as directory:
