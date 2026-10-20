@@ -25,6 +25,7 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
           cache: pip
+          cache-dependency-path: requirements-dev.txt
       - name: Install validation dependency
         run: python -m pip install -r requirements-dev.txt
       - name: Validate template and synthetic contact body
