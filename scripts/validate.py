@@ -150,6 +150,7 @@ def main(argv=None):
     group.add_argument("--arguments", type=Path, help="validate caller arguments with the tool")
     group.add_argument("--payload", type=Path, help="validate an outgoing contact body with the tool")
     parser.add_argument("--configured", action="store_true", help="reject known placeholder identifiers")
+    parser.add_argument("--json", action="store_true", help="emit a redacted JSON result to stdout")
     args = parser.parse_args(argv)
     try:
         tool = load_json(args.tool)
@@ -162,12 +163,14 @@ def main(argv=None):
             if not errors and payload["locationId"] != tool["parameters"][0]["value"]:
                 errors.append("locationId: payload destination differs from the tool's static destination")
     except ValueError as exc:
-        print(f"Validation failed: {exc}", file=sys.stderr)
-        return 1
+        errors = [f"input: {exc}"]
+    mode = "configured identifiers" if args.configured else "template placeholders allowed"
+    if args.json:
+        print(json.dumps({"ok": not errors, "mode": mode, "errors": errors, "request_sent": False}))
+        return 1 if errors else 0
     if errors:
         print("Validation failed:\n- " + "\n- ".join(errors), file=sys.stderr)
         return 1
-    mode = "configured identifiers" if args.configured else "template placeholders allowed"
     print(f"Offline validation passed ({mode}). No request sent; authorization and live behavior are unverified.")
     return 0
 

@@ -1,6 +1,7 @@
 from copy import deepcopy
 from contextlib import redirect_stderr, redirect_stdout
 import io
+import json
 from pathlib import Path
 import tempfile
 import unittest
@@ -156,6 +157,25 @@ class ValidationTests(unittest.TestCase):
             with redirect_stderr(output):
                 self.assertEqual(1, main(["--arguments", str(path)]))
             self.assertNotIn("PRIVATE_VALUE", output.getvalue())
+
+    def test_json_report_is_parseable_and_private(self):
+        for argv, expected in (([], 0), (["--configured"], 1), (["--tool", "missing.private.json"], 1)):
+            stdout, stderr = io.StringIO(), io.StringIO()
+            with redirect_stdout(stdout), redirect_stderr(stderr):
+                self.assertEqual(expected, main(["--json", *argv]))
+            result = json.loads(stdout.getvalue())
+            self.assertEqual(expected == 0, result["ok"])
+            self.assertFalse(result["request_sent"])
+            self.assertEqual("", stderr.getvalue())
+            self.assertNotIn("missing.private.json", stdout.getvalue())
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "caller.private.json"
+            path.write_text('{"PRIVATE_VALUE":"PRIVATE_VALUE"}', encoding="utf-8")
+            stdout = io.StringIO()
+            with redirect_stdout(stdout):
+                self.assertEqual(1, main(["--json", "--arguments", str(path)]))
+            self.assertTrue(json.loads(stdout.getvalue())["errors"])
+            self.assertNotIn("PRIVATE_VALUE", stdout.getvalue())
 
     def test_payload_destination_must_match_tool(self):
         with tempfile.TemporaryDirectory() as directory:
