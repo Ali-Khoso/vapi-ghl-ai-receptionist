@@ -3,6 +3,7 @@
 import argparse
 from copy import deepcopy
 import json
+import math
 from pathlib import Path
 import re
 import sys
@@ -30,9 +31,16 @@ def load_json(path):
     def reject_constant(_value):
         raise ValueError("non-JSON numeric constant")
 
+    def finite_float(value):
+        result = float(value)
+        if not math.isfinite(result):
+            raise ValueError("non-finite JSON number")
+        return result
+
     try:
         return json.loads(Path(path).read_text(encoding="utf-8-sig"),
-                          object_pairs_hook=unique_pairs, parse_constant=reject_constant)
+                          object_pairs_hook=unique_pairs, parse_constant=reject_constant,
+                          parse_float=finite_float)
     except (OSError, ValueError, RecursionError) as exc:
         # Do not echo file contents, account identifiers or caller details.
         reason = "cannot read file" if isinstance(exc, OSError) else "invalid JSON (check syntax, duplicate keys and constants)"

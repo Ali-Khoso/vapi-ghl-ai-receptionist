@@ -113,6 +113,16 @@ class ValidationTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 load_json(Path(directory) / "missing.json")
 
+    def test_json_exponents_must_stay_finite(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "number.json"
+            for number in ("1e999", "-1e999"):
+                path.write_text('{"value":' + number + '}', encoding="utf-8")
+                with self.assertRaisesRegex(ValueError, "invalid JSON"):
+                    load_json(path)
+            path.write_text('{"value":1.25e2}', encoding="utf-8")
+            self.assertEqual({"value": 125.0}, load_json(path))
+
     def test_deep_json_reports_a_private_error(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "deep.private.json"
