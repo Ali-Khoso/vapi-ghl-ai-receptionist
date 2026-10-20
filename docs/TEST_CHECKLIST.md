@@ -5,12 +5,11 @@
 Run from the repository root after installing `requirements-dev.txt`:
 
 ```sh
-python scripts/validate.py --arguments examples/tool-arguments.json
-python scripts/validate.py --payload examples/contact-payload.json
-python -m unittest discover -s tests -v
-python scripts/check_repository.py
+python scripts/preflight.py
 git diff --check
 ```
+
+The shared preflight runs both fixture validations, all regression tests and repository integrity checks. See the [command reference](CLI.md) to run each step separately or request JSON validation output.
 
 Expected: validation succeeds with placeholders permitted, all unit tests pass, repository checks pass, and Git reports no whitespace errors. The unit tests forbid socket creation while exercising validators. No service credentials are needed.
 

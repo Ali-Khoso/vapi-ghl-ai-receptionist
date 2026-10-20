@@ -7,6 +7,9 @@ Start with local validation. It sends no network requests and returns a nonzero 
 | `Missing jsonschema` | Use the virtual environment and run `python -m pip install -r requirements-dev.txt` |
 | PowerShell blocks activation | Invoke `.venv\Scripts\python.exe` directly; activation is optional |
 | Invalid JSON | Check quotes, commas, duplicate keys, encoding, and non-JSON values such as NaN; use UTF-8 |
+| Python setup fails before CI tests | Keep `cache-dependency-path: requirements-dev.txt` in the workflow; the default requirements.txt/pyproject.toml lookup does not find this project's dependency file |
+| Media integrity fails | Check the named asset against its supplied original; do not regenerate hashes to conceal accidental replacement |
+| Invalid fixture rejection is missing | Restore the synthetic negative example or investigate why its declared field is now accepted |
 | Phone validation fails | Use a string with `+` and 2-15 ASCII digits; no spaces, leading zero country prefix, or trailing newline; ask the caller rather than guessing |
 | Required or blank field | Confirm name, phone, and full service address before invoking the tool |
 | Unsupported arguments | Send only firstName, phone, address1; the location comes from static configuration |

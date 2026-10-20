@@ -51,6 +51,8 @@ python scripts/check_repository.py
 
 Dependency installation needs package-index access. Validation and tests run offline, require no credentials, and never send contact requests. Exit code 0 means the local checks passed; it does not establish authorization, number ownership, or live tool behavior.
 
+Run `python scripts/preflight.py` to perform all four Python checks with one command. See the [command reference](docs/CLI.md) for individual options, private configuration checks, JSON reports and exit codes.
+
 ## Request flow and mappings
 
 Caller -> John Williamson -> confirmed arguments -> Vapi merges fixed location -> GHL `POST /contacts/`.
@@ -82,6 +84,7 @@ Attach one contact-saving tool named exactly `Ghl_IBC_VA`. The assistant should 
 | [Vapi template](config/vapi-api-request.template.json) | Direct REST API Request tool, not a Function webhook |
 | [Synthetic fixtures](examples/README.md) | Valid arguments, outgoing body, and invalid inputs |
 | [Test checklist](docs/TEST_CHECKLIST.md) | Automated checks and optional future account acceptance |
+| [Command reference](docs/CLI.md) | Full preflight, validator flags, JSON output and exit codes |
 | [Screenshot review](docs/CONFIGURATION_REVIEW.md) | Historical observations and configuration corrections |
 | [GitHub maintenance](docs/GITHUB_UPLOAD.md) | Preserve history and push normal commits |
 | [Sources](docs/SOURCES.md) | Official references and verification limits |
