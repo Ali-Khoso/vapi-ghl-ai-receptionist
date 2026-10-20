@@ -20,6 +20,16 @@ class RepositoryTests(unittest.TestCase):
             (root / "present.md").write_text("# Present", encoding="utf-8")
             self.assertEqual(2, len(check_links(root)))
 
+    def test_unreadable_markdown_and_malformed_urls_report_errors(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "README.md").write_bytes(b"\xffPRIVATE_VALUE")
+            errors = check_links(root)
+            self.assertEqual(1, len(errors))
+            self.assertNotIn("PRIVATE_VALUE", str(errors))
+            (root / "README.md").write_text("[bad](https://[invalid)", encoding="utf-8")
+            self.assertEqual(1, len(check_links(root)))
+
     def test_malformed_fixture_shapes_report_errors(self):
         for name in ("config/vapi-api-request.template.json", "examples/tool-arguments.json"):
             with self.subTest(file=name), tempfile.TemporaryDirectory() as directory:

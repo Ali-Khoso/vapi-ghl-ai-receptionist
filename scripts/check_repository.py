@@ -21,13 +21,21 @@ def check_links(root):
     for directory in ("docs", "prompts", "examples", "assets"):
         files.extend((root / directory).rglob("*.md"))
     for path in files:
-        text = path.read_text(encoding="utf-8")
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeError):
+            errors.append(f"{path.relative_to(root)}: unreadable UTF-8 Markdown")
+            continue
         for target in re.findall(r"!?\[[^\]]*\]\(([^\s)]+)\)", text):
-            parsed = urlsplit(target)
-            if parsed.scheme or parsed.netloc or not parsed.path:
-                continue
-            destination = (path.parent / unquote(parsed.path)).resolve()
-            if not destination.is_relative_to(root.resolve()) or not destination.exists():
+            try:
+                parsed = urlsplit(target)
+                if parsed.scheme or parsed.netloc or not parsed.path:
+                    continue
+                destination = (path.parent / unquote(parsed.path)).resolve()
+                valid = destination.is_relative_to(root.resolve()) and destination.exists()
+            except (OSError, ValueError):
+                valid = False
+            if not valid:
                 errors.append(f"{path.relative_to(root)}: broken or escaping local link")
     return errors
 
