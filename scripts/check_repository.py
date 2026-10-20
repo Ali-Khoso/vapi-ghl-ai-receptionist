@@ -15,6 +15,12 @@ except ModuleNotFoundError:
                           load_json, validate_arguments, validate_payload, validate_tool)
 
 
+def media_hash(path):
+    """Hash large demo recordings with bounded memory (Python 3.11+)."""
+    with path.open("rb") as stream:
+        return hashlib.file_digest(stream, "sha256").hexdigest()
+
+
 def check_links(root):
     errors = []
     files = list(root.glob("*.md"))
@@ -79,7 +85,7 @@ def check_repository(root=ROOT):
                 errors.append("media manifest: require each original asset exactly once")
                 continue
             seen.add(filename)
-            actual = hashlib.sha256((root / "assets" / filename).read_bytes()).hexdigest()
+            actual = media_hash(root / "assets" / filename)
             if actual != expected:
                 errors.append(f"assets/{filename}: original media hash changed")
         if seen != expected_names:

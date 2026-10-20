@@ -1,10 +1,11 @@
 from pathlib import Path
 import json
+import hashlib
 import shutil
 import tempfile
 import unittest
 
-from scripts.check_repository import ROOT, check_links, check_repository
+from scripts.check_repository import ROOT, check_links, check_repository, media_hash
 
 
 class RepositoryTests(unittest.TestCase):
@@ -29,6 +30,15 @@ class RepositoryTests(unittest.TestCase):
             self.assertNotIn("PRIVATE_VALUE", str(errors))
             (root / "README.md").write_text("[bad](https://[invalid)", encoding="utf-8")
             self.assertEqual(1, len(check_links(root)))
+
+    def test_streamed_media_hash_handles_multiple_chunks(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "recording.mp4"
+            content = bytes(range(256)) * 8192
+            path.write_bytes(content)
+            self.assertEqual(hashlib.sha256(content).hexdigest(), media_hash(path))
+            path.write_bytes(b"")
+            self.assertEqual(hashlib.sha256(b"").hexdigest(), media_hash(path))
 
     def test_added_screenshot_tampering_is_detected(self):
         with tempfile.TemporaryDirectory() as directory:
