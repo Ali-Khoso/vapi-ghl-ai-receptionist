@@ -30,3 +30,22 @@ Stage the intended files explicitly, inspect `git diff --cached`, and commit a u
 If a push is rejected because the remote advanced, fetch and inspect the incoming commits. Integrate the history carefully before retrying. Never force-push, delete existing branches to bypass a rejection, or create empty commits to inflate a count.
 
 Keep the supplied MP4 and PNG. Never commit private configuration, bearer tokens, real customer information, call logs, or transcripts. `.gitignore` reduces accidental additions but is not a credential scanner.
+
+## Verify what GitHub received
+
+After a successful push, run:
+
+```sh
+git rev-list --count HEAD
+git rev-parse HEAD
+git ls-remote origin refs/heads/main
+git status --short --branch
+```
+
+The local HEAD hash and the remote main hash must match. The count reports commits reachable from local HEAD; a matching remote hash confirms that history is on GitHub. A clean working tree confirms there are no outstanding tracked edits, but ignored private files are intentionally excluded.
+
+To check tracked filenames, compare `git ls-files` with the repository's Code view. A single commit can upload many files, so file count, commit count and workflow-run count measure different things.
+
+Open the repository's [commit history](https://github.com/Ali-Khoso/vapi-ghl-ai-receptionist/commits/main) to inspect commits, and [Actions](https://github.com/Ali-Khoso/vapi-ghl-ai-receptionist/actions) to inspect checks. A failed Actions run does not roll back an uploaded commit. Verify the newest run's commit hash and all matrix jobs; older failure notifications can remain in the inbox after a fix.
+
+The workflow caches dependencies using `requirements-dev.txt`. Keep its `cache-dependency-path` aligned with the actual installation file when renaming dependencies. See [contributing](../CONTRIBUTING.md) for change and review expectations.

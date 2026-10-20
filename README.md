@@ -99,4 +99,6 @@ Keep credentials, real customer information, transcripts, and new recordings out
 
 ## Reuse
 
+See [contributing](CONTRIBUTING.md) for validation and review expectations and [GitHub maintenance](docs/GITHUB_UPLOAD.md) for verifying uploaded commits and workflow results.
+
 Adapt the business identity and services in the active prompt and greeting together. Preserve the tool and field names unless updating their mappings throughout. No software license is assigned; contact the author for redistribution permission.
