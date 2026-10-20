@@ -85,6 +85,13 @@ class ValidationTests(unittest.TestCase):
             self.assertTrue(validate_tool(tool), key)
         self.assertTrue(validate_tool({**self.tool, "function": {}}))
 
+    def test_timeout_requires_an_integer(self):
+        for timeout in (20.0, "20", True, None):
+            with self.subTest(timeout=timeout):
+                errors = validate_tool({**self.tool, "timeoutSeconds": timeout})
+                self.assertTrue(any("timeoutSeconds" in error for error in errors))
+        self.assertEqual([], validate_tool({**self.tool, "timeoutSeconds": 20}))
+
     def test_malformed_static_parameters(self):
         for value in (None, {}, [], [None], [{"key": "locationId"}],
                       [{"key": "locationId", "value": "{{ caller.location }}"}],

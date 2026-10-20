@@ -101,7 +101,7 @@ def validate_tool(tool, configured=False):
     expected = {"type": "apiRequest", "name": "Ghl_IBC_VA", "method": "POST",
                 "url": "https://services.leadconnectorhq.com/contacts/", "timeoutSeconds": 20}
     for key, value in expected.items():
-        if tool.get(key) != value:
+        if tool.get(key) != value or type(tool.get(key)) is not type(value):
             errors.append(f"{key}: must match the documented project setting")
     allowed = set(expected) | {"description", "credentialId", "headers", "body", "parameters"}
     if set(tool) - allowed:
