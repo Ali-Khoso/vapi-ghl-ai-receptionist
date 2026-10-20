@@ -113,6 +113,19 @@ class ValidationTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 load_json(Path(directory) / "missing.json")
 
+    def test_deep_json_reports_a_private_error(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "deep.private.json"
+            path.write_text('[' * 2000 + '"PRIVATE_VALUE"' + ']' * 2000, encoding="utf-8")
+            output = io.StringIO()
+            with redirect_stderr(output):
+                self.assertEqual(1, main(["--arguments", str(path)]))
+            self.assertNotIn("PRIVATE_VALUE", output.getvalue())
+            self.assertNotIn("Traceback", output.getvalue())
+            with patch("scripts.validate.json.loads", side_effect=RecursionError("PRIVATE_VALUE")):
+                with self.assertRaisesRegex(ValueError, "invalid JSON"):
+                    load_json(path)
+
     def test_cli_exit_codes_and_redacted_errors(self):
         for argv, expected in (([], 0), (["--arguments", str(ROOT / "examples/tool-arguments.json")], 0),
                                (["--payload", str(ROOT / "examples/contact-payload.json")], 0),

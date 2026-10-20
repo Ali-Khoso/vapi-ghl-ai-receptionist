@@ -33,7 +33,7 @@ def load_json(path):
     try:
         return json.loads(Path(path).read_text(encoding="utf-8-sig"),
                           object_pairs_hook=unique_pairs, parse_constant=reject_constant)
-    except (OSError, ValueError) as exc:
+    except (OSError, ValueError, RecursionError) as exc:
         # Do not echo file contents, account identifiers or caller details.
         reason = "cannot read file" if isinstance(exc, OSError) else "invalid JSON (check syntax, duplicate keys and constants)"
         raise ValueError(reason) from None
