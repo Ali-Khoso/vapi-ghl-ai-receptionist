@@ -69,7 +69,9 @@ def check_repository(root=ROOT):
     errors.extend(check_links(root))
     try:
         entries = (root / "assets/SHA256SUMS").read_text(encoding="utf-8").splitlines()
-        expected_names = {"AI_Receptionist_Demo_90s.mp4", "vapi-call-demo.png"}
+        expected_names = {"AI_Receptionist_Demo_90s.mp4", "vapi-call-demo.png",
+                          "vapi-assistant-overview.png", "vapi-prompt-and-greeting.png",
+                          "vapi-attached-contact-tool.png", "vapi-contact-tool-settings.png"}
         seen = set()
         for line in entries:
             expected, filename = line.split()

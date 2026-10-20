@@ -2,7 +2,7 @@
 
 The supplied MP4 and PNG are retained byte-for-byte. The screenshot shows a historical greeting using Wellness Partners, while the recommended John Williamson prompt uses BrightFix Home Services. Neither media file is evidence that the revised tool configuration successfully created a CRM contact.
 
-`SHA256SUMS` records the hashes taken before repository improvements. The offline repository check verifies them to catch accidental asset replacement. No recording scripts or new recordings are included.
+`SHA256SUMS` retains the two hashes taken before repository improvements and also records the four later supplied screenshots. The offline repository check requires all six assets exactly once and verifies their bytes to catch accidental replacement. No recording scripts or new recordings are included.
 
 ## Additional screenshots supplied by the author
 

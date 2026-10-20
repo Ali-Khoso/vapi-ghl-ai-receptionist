@@ -30,6 +30,15 @@ class RepositoryTests(unittest.TestCase):
             (root / "README.md").write_text("[bad](https://[invalid)", encoding="utf-8")
             self.assertEqual(1, len(check_links(root)))
 
+    def test_added_screenshot_tampering_is_detected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            shutil.copytree(ROOT / "assets", root / "assets")
+            (root / "assets/vapi-assistant-overview.png").write_bytes(b"changed")
+            errors = check_repository(root)
+            self.assertTrue(any("vapi-assistant-overview.png: original media hash changed" in error
+                                for error in errors))
+
     def test_malformed_fixture_shapes_report_errors(self):
         for name in ("config/vapi-api-request.template.json", "examples/tool-arguments.json"):
             with self.subTest(file=name), tempfile.TemporaryDirectory() as directory:
